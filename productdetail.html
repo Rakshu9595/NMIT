@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Smart Watch - Product Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --accent-color: #36b9cc;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            padding-top: 20px;
+            padding-bottom: 50px;
+        }
+        
+        .product-card {
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-image {
+            background: linear-gradient(45deg, #f8f9fc, #e2e6f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 350px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            max-width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            transition: transform 0.5s;
+        }
+        
+        .product-image img:hover {
+            transform: scale(1.05);
+        }
+        
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .gallery-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .gallery-thumb:hover, .gallery-thumb.active {
+            opacity: 1;
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .seller-card {
+            background: linear-gradient(to bottom right, #f8f9fc, #e2e6f0);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        }
+        
+        .seller-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .related-products {
+            margin-top: 40px;
+        }
+        
+        .related-product-card {
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+        }
+        
+        .related-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+        }
+        
+        .share-buttons .btn {
+            border-radius: 50px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .category-badge {
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .price-tag {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .add-to-cart-btn {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(78, 115, 223, 0.4);
+        }
+        
+        .add-to-cart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.6);
+        }
+        
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        .cart-icon i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74a3b;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .flying-item {
+            position: fixed;
+            z-index: 1001;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 1s cubic-bezier(0.42, 0, 0.58, 1);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Tabs styling */
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 12px 20px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background: transparent;
+        }
+        
+        .specs-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .specs-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .review-card {
+            border-radius: 12px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .review-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .faq-item {
+            border-radius: 12px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 15px 20px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+            background: #f8f9fc;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding: 15px 20px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .product-image {
+                min-height: 250px;
+            }
+            
+            .gallery-thumb {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cart Icon -->
+        <div class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <div class="cart-count">0</div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Electronics</a></li>
+                <li class="breadcrumb-item"><a href="#">Wearables</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Smart Watches</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <!-- Product Images -->
+            <div class="col-lg-6">
+                <div class="product-card mb-4">
+                    <div class="product-image p-4">
+                        <img src="https://images.samsung.com/is/image/samsung/p6pim/in/f2507/gallery/in-galaxy-watch8-l330-sm-l330ndaains-547660147?$684_547_PNG$" alt="Product Image" id="main-product-image">
+                    </div>
+                </div>
+                
+                <div class="gallery-thumbnails">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/in/f2507/gallery/in-galaxy-watch8-l325-sm-l325fdaains-547660314?$684_547_PNG$" class="gallery-thumb active" data-image="https://via.placeholder.com/500x500/f8f9fa/2c3e50?text=Smart+Watch">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/in/f2507/gallery/in-galaxy-watch8-l325-sm-l325fdaains-547660303?$Q90_684_547_JPG$" class="gallery-thumb" data-image="https://via.placeholder.com/500x500/f8f9fa/3498db?text=Side+View">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/in/f2507/gallery/in-galaxy-watch8-l325-sm-l325fdaains-547660304?$Q90_684_547_JPG$" class="gallery-thumb" data-image="https://via.placeholder.com/500x500/f8f9fa/e74c3c?text=With+Box">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/in/f2507/gallery/in-galaxy-watch8-l325-sm-l325fdaains-547660305?$Q90_684_547_JPG$" class="gallery-thumb" data-image="https://via.placeholder.com/500x500/f8f9fa/2ecc71?text=On+Wrist">
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="col-lg-6">
+                <div class="product-details">
+                    <span class="category-badge">Smart Watches</span>
+                    <h1 class="mt-2 mb-1">Premium Smart Watch Series 5</h1>
+                    <div class="rating mb-3">
+                        <span class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </span>
+                        <span class="ms-2">(128 reviews)</span>
+                    </div>
+                    
+                    <div class="price-tag mb-3">$249.99 <span class="text-decoration-line-through text-muted ms-2" style="font-size: 1.2rem;">$299.99</span></div>
+                    
+                    <p class="lead">The latest smart watch with heart rate monitoring, sleep tracking, and 7-day battery life. Stay connected with calls, messages, and notifications right on your wrist.</p>
+                    
+                    <div class="product-features mb-4">
+                        <h5>Key Features:</h5>
+                        <ul>
+                            <li>1.7-inch AMOLED Touch Display</li>
+                            <li>Blood Oxygen & Heart Rate Monitoring</li>
+                            <li>Water Resistant (5ATM)</li>
+                            <li>GPS Tracking for Outdoor Activities</li>
+                            <li>7 Days Battery Life</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-flex mb-4">
+                        <div class="me-4">
+                            <h6>Color:</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="colorOptions" id="colorBlack" checked>
+                                <label class="form-check-label" for="colorBlack">Midnight Black</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="colorOptions" id="colorSilver">
+                                <label class="form-check-label" for="colorSilver">Silver</label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6>Size:</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sizeOptions" id="size42" checked>
+                                <label class="form-check-label" for="size42">42mm</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sizeOptions" id="size46">
+                                <label class="form-check-label" for="size46">46mm</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-4">
+                            <label for="quantity" class="form-label"><strong>Quantity:</strong></label>
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
+                                <input type="text" class="form-control text-center" value="1" id="quantity">
+                                <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
+                            </div>
+                        </div>
+                        
+                        <button class="btn add-to-cart-btn mt-3">
+                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                        </button>
+                    </div>
+                    
+                    <div class="share-buttons">
+                        <h5>Share this product:</h5>
+                        <button class="btn btn-outline-primary"><i class="fas fa-link me-2"></i>Copy Link</button>
+                        <button class="btn btn-outline-success"><i class="fab fa-whatsapp me-2"></i>WhatsApp</button>
+                        <button class="btn btn-outline-info"><i class="fab fa-facebook me-2"></i>Facebook</button>
+                        <button class="btn btn-outline-primary"><i class="fab fa-twitter me-2"></i>Twitter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Tabs -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab">Specifications</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (128)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="faq-tab" data-bs-toggle="tab" data-bs-target="#faq" type="button" role="tab">FAQ</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-4 bg-white rounded-bottom shadow-sm" id="productTabsContent">
+                    <!-- Description Tab -->
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        <h4>About This Product</h4>
+                        <p>The Premium Smart Watch Series 5 is designed for those who demand both style and functionality. With its sleek design and advanced features, it's the perfect companion for your active lifestyle.</p>
+                        
+                        <h5 class="mt-4">Detailed Features</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3 text-primary">
+                                        <i class="fas fa-heartbeat fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Health Monitoring</h6>
+                                        <p class="mb-0">Track your heart rate, blood oxygen levels, and sleep patterns with advanced sensors.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3 text-primary">
+                                        <i class="fas fa-map-marked-alt fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>GPS Tracking</h6>
+                                        <p class="mb-0">Built-in GPS accurately tracks your outdoor activities like running, cycling, and hiking.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3 text-primary">
+                                        <i class="fas fa-bell fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Smart Notifications</h6>
+                                        <p class="mb-0">Receive calls, messages, and app notifications directly on your wrist.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3 text-primary">
+                                        <i class="fas fa-tint fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Water Resistant</h6>
+                                        <p class="mb-0">Swim with confidence with 5ATM water resistance (up to 50 meters).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-4">What's in the Box</h5>
+                        <ul>
+                            <li>Premium Smart Watch Series 5</li>
+                            <li>Magnetic Charging Cable</li>
+                            <li>Quick Start Guide</li>
+                            <li>Warranty Card (1 Year)</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Specifications Tab -->
+                    <div class="tab-pane fade" id="specifications" role="tabpanel">
+                        <h4>Technical Specifications</h4>
+                        <div class="table-responsive">
+                            <table class="table specs-table mt-4">
+                                <tr>
+                                    <td class="fw-bold" width="30%">Display</td>
+                                    <td>1.7-inch AMOLED, 454×454 resolution, Always-On display</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Battery Life</td>
+                                    <td>Up to 7 days, Magnetic charging</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Connectivity</td>
+                                    <td>Bluetooth 5.2, WiFi, GPS, GLONASS</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Sensors</td>
+                                    <td>Heart rate monitor, Blood oxygen monitor, Accelerometer, Gyroscope, Ambient light sensor</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Water Resistance</td>
+                                    <td>5ATM (up to 50 meters)</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Compatibility</td>
+                                    <td>iOS 12.0+ and Android 7.0+</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Dimensions</td>
+                                    <td>42mm: 42 x 42 x 11.5mm, 46mm: 46 x 46 x 11.5mm</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Weight</td>
+                                    <td>42mm: 38g, 46mm: 42g (without strap)</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Materials</td>
+                                    <td>Aluminum alloy case, Corning Gorilla Glass 3, Silicone strap</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        <h4>Customer Reviews</h4>
+                        <div class="row align-items-center mt-4">
+                            <div class="col-md-3 text-center">
+                                <h2 class="text-primary">4.7</h2>
+                                <div class="rating mb-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                </div>
+                                <p class="text-muted">Based on 128 reviews</p>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-3" style="width: 80px;">5 stars</div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 85%;"></div>
+                                    </div>
+                                    <div>85%</div>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-3" style="width: 80px;">4 stars</div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 10%;"></div>
+                                    </div>
+                                    <div>10%</div>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-3" style="width: 80px;">3 stars</div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 3%;"></div>
+                                    </div>
+                                    <div>3%</div>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-3" style="width: 80px;">2 stars</div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 1%;"></div>
+                                    </div>
+                                    <div>1%</div>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-3" style="width: 80px;">1 star</div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 1%;"></div>
+                                    </div>
+                                    <div>1%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-5 mb-4">Latest Reviews</h5>
+                        
+                        <div class="review-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/50x50/f8f9fa/2c3e50?text=J" class="review-avatar me-3" alt="User Avatar">
+                                    <div>
+                                        <h6 class="mb-0">John D.</h6>
+                                        <div class="rating small">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-muted">3 days ago</span>
+                            </div>
+                            <h5>Excellent smartwatch!</h5>
+                            <p class="mb-0">This is by far the best smartwatch I've owned. The battery life is incredible - I only need to charge it once a week. The health tracking features are accurate, and the screen is bright and crisp even in direct sunlight.</p>
+                        </div>
+                        
+                        <div class="review-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/50x50/f8f9fa/2c3e50?text=S" class="review-avatar me-3" alt="User Avatar">
+                                    <div>
+                                        <h6 class="mb-0">Sarah M.</h6>
+                                        <div class="rating small">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-muted">1 week ago</span>
+                            </div>
+                            <h5>Perfect for fitness enthusiasts</h5>
+                            <p class="mb-0">As a runner, I appreciate the accurate GPS tracking and heart rate monitoring. The sleep tracking has also helped me improve my sleep schedule. The watch is lightweight and comfortable to wear all day and night.</p>
+                        </div>
+                        
+                        <div class="review-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/50x50/f8f9fa/2c3e50?text=M" class="review-avatar me-3" alt="User Avatar">
+                                    <div>
+                                        <h6 class="mb-0">Michael T.</h6>
+                                        <div class="rating small">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="far fa-star text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-muted">2 weeks ago</span>
+                            </div>
+                            <h5>Great, but with a minor issue</h5>
+                            <p class="mb-0">Overall, I'm very happy with this smartwatch. The only reason I'm giving 4 stars instead of 5 is that the notification system can be a bit delayed sometimes. Other than that, it's an excellent device.</p>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">Load More Reviews</button>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ Tab -->
+                    <div class="tab-pane fade" id="faq" role="tabpanel">
+                        <h4>Frequently Asked Questions</h4>
+                        
+                        <div class="faq-item mt-4">
+                            <div class="faq-question">
+                                How long does the battery last?
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                The battery life depends on usage. With typical use (including notifications, workouts, and sleep tracking), the battery lasts up to 7 days. With heavy use (constant GPS tracking, always-on display), it lasts about 3-4 days.
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Is the watch compatible with iPhone?
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                Yes, the watch is compatible with iPhones running iOS 12.0 or later. You can download the companion app from the App Store to sync data and manage settings.
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Can I swim with this watch?
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                Yes, the watch has a 5ATM water resistance rating, which means it's suitable for swimming and can withstand water pressure up to 50 meters. However, we don't recommend using it for scuba diving or high-speed water sports.
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How accurate is the heart rate monitor?
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                Our heart rate monitor uses advanced sensors and algorithms to provide medical-grade accuracy. In tests, it showed 98% accuracy compared to professional medical devices during various activities.
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What payment methods are accepted?
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers. All payments are processed securely through encrypted channels.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seller Information -->
+        <div class="row mt-5">
+            <div class="col-lg-6">
+                <div class="seller-card">
+                    <h4 class="mb-4">Seller Information</h4>
+                    <div class="d-flex align-items-center">
+                        <img src="https://creator.nightcafe.studio/jobs/44cb7mYuNopYNbBepXwc/44cb7mYuNopYNbBepXwc--1--2bhq2.jpg" class="seller-img me-4" alt="Seller Image">
+                        <div>
+                            <h5>John TechStore</h5>
+                            <p class="mb-2"><i class="fas fa-star text-warning me-1"></i> 4.8 (356 ratings)</p>
+                            <p class="mb-2"><i class="fas fa-map-marker-alt me-1"></i> New York, USA</p>
+                            <div class="d-flex mt-3">
+                                <button class="btn btn-outline-primary btn-sm me-2"><i class="fas fa-comment me-1"></i> Contact Seller</button>
+                                <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-store me-1"></i> Visit Store</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Products -->
+        <div class="related-products">
+            <h3 class="mb-4">Related Products</h3>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card related-product-card h-100">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7VmIXNbtDt6ilw0v4SWMjJSiyLVM3SaSGcw&s" class="card-img-top" alt="Related Product">
+                        <div class="card-body">
+                            <h5 class="card-title">Fitness Tracker Pro</h5>
+                            <p class="card-text">$129.99</p>
+                            <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card related-product-card h-100">
+                        <img src="https://m.media-amazon.com/images/I/51fkoZe-K6L.jpg" class="card-img-top" alt="Related Product">
+                        <div class="card-body">
+                            <h5 class="card-title">Wireless Earbuds</h5>
+                            <p class="card-text">$89.99</p>
+                            <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card related-product-card h-100">
+                        <img src="https://m.media-amazon.com/images/I/71z8bQorkML.jpg" class="card-img-top" alt="Related Product">
+                        <div class="card-body">
+                            <h5 class="card-title">Premium Phone Case</h5>
+                            <p class="card-text">$34.99</p>
+                            <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card related-product-card h-100">
+                        <img src="https://zebronics.com/cdn/shop/products/ZEB-WCS1500S-pic1.jpg?v=1619604514&width=2048" class="card-img-top" alt="Related Product">
+                        <div class="card-body">
+                            <h5 class="card-title">Wireless Charging Dock</h5>
+                            <p class="card-text">$49.99</p>
+                            <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Image gallery functionality
+            const thumbnails = document.querySelectorAll('.gallery-thumb');
+            const mainImage = document.getElementById('main-product-image');
+            
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Update main image
+                    mainImage.src = this.getAttribute('data-image');
+                    
+                    // Update active thumbnail
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Quantity controls
+            const quantityInput = document.getElementById('quantity');
+            document.getElementById('increment').addEventListener('click', function() {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            });
+            
+            document.getElementById('decrement').addEventListener('click', function() {
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                }
+            });
+            
+            // Add to cart with animation
+            const addToCartBtn = document.querySelector('.add-to-cart-btn');
+            const cartCount = document.querySelector('.cart-count');
+            let count = 0;
+            
+            addToCartBtn.addEventListener('click', function() {
+                // Get quantity
+                const quantity = parseInt(quantityInput.value);
+                
+                // Create flying items for each quantity
+                for (let i = 0; i < quantity; i++) {
+                    setTimeout(() => {
+                        createFlyingItem(i);
+                    }, i * 200);
+                }
+                
+                // Update cart count after all animations
+                setTimeout(() => {
+                    count += quantity;
+                    cartCount.textContent = count;
+                    
+                    // Show added to cart message
+                    showNotification('Added to cart successfully!');
+                }, quantity * 200 + 1000);
+            });
+            
+            function createFlyingItem(delayIndex) {
+                // Create flying item element
+                const flyingItem = document.createElement('div');
+                flyingItem.className = 'flying-item';
+                flyingItem.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+                
+                // Set initial position (button position)
+                const rect = addToCartBtn.getBoundingClientRect();
+                flyingItem.style.left = (rect.left + rect.width/2 - 15) + 'px';
+                flyingItem.style.top = (rect.top - 15) + 'px';
+                
+                document.body.appendChild(flyingItem);
+                
+                // Animate to cart icon
+                setTimeout(() => {
+                    const cartRect = document.querySelector('.cart-icon').getBoundingClientRect();
+                    flyingItem.style.left = (cartRect.left + cartRect.width/2 - 15) + 'px';
+                    flyingItem.style.top = (cartRect.top + cartRect.height/2 - 15) + 'px';
+                    flyingItem.style.transform = 'scale(0.5)';
+                    flyingItem.style.opacity = '0.5';
+                    
+                    // Remove element after animation completes
+                    setTimeout(() => {
+                        flyingItem.remove();
+                    }, 1000);
+                }, 100);
+            }
+            
+            function showNotification(message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = 'alert alert-success position-fixed';
+                notification.style.bottom = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '1050';
+                notification.style.transition = 'opacity 0.5s';
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 3000);
+            }
+            
+            // Share buttons functionality
+            const shareButtons = document.querySelectorAll('.share-buttons .btn');
+            shareButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    let message;
+                    
+                    if (this.querySelector('.fa-link')) {
+                        navigator.clipboard.writeText(window.location.href);
+                        message = 'Link copied to clipboard!';
+                    } else if (this.querySelector('.fa-whatsapp')) {
+                        message = 'Sharing via WhatsApp...';
+                    } else if (this.querySelector('.fa-facebook')) {
+                        message = 'Sharing via Facebook...';
+                    } else if (this.querySelector('.fa-twitter')) {
+                        message = 'Sharing via Twitter...';
+                    }
+                    
+                    showNotification(message);
+                });
+            });
+            
+            // FAQ accordion functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    // Toggle active class on clicked item
+                    item.classList.toggle('active');
+                    
+                    // Close other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

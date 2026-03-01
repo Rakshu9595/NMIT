@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase History | StyleCart</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --success-color: #1cc88a;
+            --warning-color: #f6c23e;
+            --info-color: #36b9cc;
+            --danger-color: #e74a3b;
+            --dark-color: #5a5c69;
+            --light-bg: #f8f9fc;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 1rem;
+        }
+        
+        /* Purchase Card Styles */
+        .purchase-card {
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            background: white;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .purchase-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .purchase-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Animated badges */
+        .badge-eco {
+            background: linear-gradient(135deg, var(--success-color), #17a673);
+            animation: pulse 3s infinite, float 6s ease-in-out infinite;
+        }
+        
+        .badge-frequent {
+            background: linear-gradient(135deg, var(--info-color), #2c9faf);
+            animation: pulse 3s infinite 0.7s, float 6s ease-in-out infinite 1s;
+        }
+        
+        .badge-premium {
+            background: linear-gradient(135deg, var(--warning-color), #e0a800);
+            animation: pulse 3s infinite 1.4s, float 6s ease-in-out infinite 2s;
+        }
+        
+        .badge-new {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            animation: pulse 2s infinite, shake 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(28, 200, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+        
+        /* Enhanced Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+            margin: 2.5rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            padding: 1.2rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 5px solid white;
+            box-shadow: 0 0 0 3px var(--primary-color);
+            z-index: 2;
+        }
+        
+        .timeline-item.recent::before {
+            background: var(--success-color);
+            box-shadow: 0 0 0 3px var(--success-color);
+            animation: timelinePulse 2s infinite;
+        }
+        
+        @keyframes timelinePulse {
+            0% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(28, 200, 138, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(28, 200, 138, 0); }
+        }
+        
+        /* Star rating enhancements */
+        .star-rating {
+            color: #ddd;
+            font-size: 1.3rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .star-rating .filled {
+            color: var(--warning-color);
+            text-shadow: 0 0 8px rgba(246, 194, 62, 0.6);
+        }
+        
+        .star-rating i {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .star-rating i:hover {
+            transform: scale(1.4) rotate(12deg);
+            color: var(--warning-color) !important;
+        }
+        
+        /* Button enhancements */
+        .reorder-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .reorder-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .reorder-btn:hover::before {
+            left: 100%;
+        }
+        
+        .reorder-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(78, 115, 223, 0.4);
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, var(--success-color), #17a673);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.4s ease;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(28, 200, 138, 0.4);
+        }
+        
+        /* Image enhancements */
+        .purchase-image {
+            border-radius: 12px;
+            transition: all 0.5s ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .purchase-image:hover {
+            transform: scale(1.08) rotate(2deg);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Stats card enhancements */
+        .stats-card {
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Filter buttons */
+        .filter-btn {
+            transition: all 0.4s ease;
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            z-index: -1;
+            transition: all 0.4s ease;
+            border-radius: 50px;
+        }
+        
+        .filter-btn.active::before {
+            opacity: 1;
+        }
+        
+        .filter-btn.active {
+            color: white;
+            border-color: transparent;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Progress bar animation */
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #eaecf4;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transition: width 1.5s ease-in-out;
+        }
+        
+        /* Chart animation */
+        .chart-bar {
+            background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
+            border-radius: 4px 4px 0 0;
+            width: 30px;
+            margin: 0 10px;
+            transition: height 1.2s ease-in-out;
+        }
+        
+        /* Floating notification */
+        .notification {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        /* Page loader */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(78, 115, 223, 0.2);
+            border-radius: 50%;
+            border-top: 5px solid var(--primary-color);
+            animation: spin 1.2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .timeline {
+                padding-left: 2rem;
+            }
+            
+            .timeline-item::before {
+                left: -2.4rem;
+                width: 20px;
+                height: 20px;
+            }
+            
+            .purchase-card .row {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .purchase-image {
+                margin-bottom: 1.2rem;
+                max-width: 70%;
+            }
+            
+            .chart-bar {
+                width: 20px;
+                margin: 0 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="loader-wrapper" id="pageLoader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-shopping-bag me-2 text-primary"></i>StyleCart
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Purchase History</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="#" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-user me-1"></i> My Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <!-- Page Header -->
+        <div class="row mb-5" data-aos="fade-down">
+            <div class="col-md-8">
+                <h1 class="fw-bold mb-3"><i class="fas fa-history me-2 text-primary"></i>Purchase History</h1>
+                <p class="text-muted">Review your past orders, download invoices, and reorder items.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary filter-btn active">All</button>
+                    <button type="button" class="btn btn-outline-primary filter-btn">Last 30 Days</button>
+                    <button type="button" class="btn btn-outline-primary filter-btn">2023</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Purchase Timeline -->
+                <div class="card stats-card mb-5" data-aos="fade-right">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4"><i class="fas fa-stream me-2 text-primary"></i>Purchase Timeline</h5>
+                        <div class="timeline">
+                            <div class="timeline-item recent">
+                                <h6>December 15, 2023</h6>
+                                <p class="text-muted">Wireless Headphones & Smart Watch</p>
+                                <span class="badge bg-success">Latest</span>
+                            </div>
+                            <div class="timeline-item">
+                                <h6>November 28, 2023</h6>
+                                <p class="text-muted">Running Shoes & Fitness Tracker</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h6>October 12, 2023</h6>
+                                <p class="text-muted">Travel Backpack & Accessories</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h6>September 5, 2023</h6>
+                                <p class="text-muted">Smart Home Devices</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase List -->
+                <h3 class="mb-4" data-aos="fade-up">Your Orders</h3>
+                
+                <!-- Purchase 1 -->
+                <div class="card purchase-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <img src="https://via.placeholder.com/120/4e73df/ffffff?text=Headphones" class="purchase-image img-fluid" alt="Headphones">
+                            </div>
+                            <div class="col-md-5">
+                                <h5 class="card-title">Wireless Headphones</h5>
+                                <p class="text-muted mb-1">Order #12345 • December 15, 2023</p>
+                                <p class="fw-bold text-primary mb-2">₹499</p>
+                                <div class="star-rating mb-2" data-rating="4">
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="badge badge-eco mb-1">Eco Buyer</span>
+                                <span class="badge badge-new ms-1">New</span>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <button class="btn btn-primary reorder-btn mb-2">
+                                    <i class="fas fa-shopping-cart me-1"></i> Reorder
+                                </button>
+                                <button class="btn btn-success download-btn">
+                                    <i class="fas fa-download me-1"></i> Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase 2 -->
+                <div class="card purchase-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <img src="https://via.placeholder.com/120/6f42c1/ffffff?text=Watch" class="purchase-image img-fluid" alt="Smart Watch">
+                            </div>
+                            <div class="col-md-5">
+                                <h5 class="card-title">Smart Watch Series 5</h5>
+                                <p class="text-muted mb-1">Order #12346 • December 15, 2023</p>
+                                <p class="fw-bold text-primary mb-2">₹799</p>
+                                <div class="star-rating mb-2" data-rating="5">
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                </div>
+                                <span class="badge badge-premium mb-1">Premium Buyer</span>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <button class="btn btn-primary reorder-btn mb-2">
+                                    <i class="fas fa-shopping-cart me-1"></i> Reorder
+                                </button>
+                                <button class="btn btn-success download-btn">
+                                    <i class="fas fa-download me-1"></i> Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase 3 -->
+                <div class="card purchase-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <img src="https://via.placeholder.com/120/36b9cc/ffffff?text=Shoes" class="purchase-image img-fluid" alt="Running Shoes">
+                            </div>
+                            <div class="col-md-5">
+                                <h5 class="card-title">Premium Running Shoes</h5>
+                                <p class="text-muted mb-1">Order #12347 • November 28, 2023</p>
+                                <p class="fw-bold text-primary mb-2">₹1299</p>
+                                <div class="star-rating mb-2" data-rating="3">
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="badge badge-frequent mb-1">Frequent Buyer</span>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <button class="btn btn-primary reorder-btn mb-2">
+                                    <i class="fas fa-shopping-cart me-1"></i> Reorder
+                                </button>
+                                <button class="btn btn-success download-btn">
+                                    <i class="fas fa-download me-1"></i> Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase 4 -->
+                <div class="card purchase-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <img src="https://via.placeholder.com/120/1cc88a/ffffff?text=Backpack" class="purchase-image img-fluid" alt="Travel Backpack">
+                            </div>
+                            <div class="col-md-5">
+                                <h5 class="card-title">Travel Backpack</h5>
+                                <p class="text-muted mb-1">Order #12348 • October 12, 2023</p>
+                                <p class="fw-bold text-primary mb-2">₹1599</p>
+                                <div class="star-rating mb-2" data-rating="4">
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star filled"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="badge badge-eco mb-1">Eco Buyer</span>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <button class="btn btn-primary reorder-btn mb-2">
+                                    <i class="fas fa-shopping-cart me-1"></i> Reorder
+                                </button>
+                                <button class="btn btn-success download-btn">
+                                    <i class="fas fa-download me-1"></i> Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Stats Card -->
+                <div class="card stats-card mb-4" data-aos="fade-left" data-aos-delay="100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-4">Purchase Stats</h5>
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="border rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; border-color: var(--primary-color) !important;">
+                                    <div>
+                                        <h4 class="mb-0">12</h4>
+                                        <small>Orders</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; border-color: var(--success-color) !important;">
+                                    <div>
+                                        <h4 class="mb-0">₹9,876</h4>
+                                        <small>Total</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Animated Progress Bar -->
+                        <div class="mb-3">
+                            <p class="text-start mb-1">Monthly Spending <span class="float-end">₹2,987/₹5,000</span></p>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-chart-line me-1"></i> View Full Statistics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spending Chart -->
+                <div class="card stats-card mb-4" data-aos="fade-left" data-aos-delay="200">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Monthly Spending</h5>
+                        <div class="d-flex align-items-end justify-content-center" style="height: 180px;">
+                            <div class="chart-bar" style="height: 40px;"></div>
+                            <div class="chart-bar" style="height: 70px;"></div>
+                            <div class="chart-bar" style="height: 100px;"></div>
+                            <div class="chart-bar" style="height: 150px;"></div>
+                            <div class="chart-bar" style="height: 120px;"></div>
+                            <div class="chart-bar" style="height: 80px;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small>Jan</small>
+                            <small>Feb</small>
+                            <small>Mar</small>
+                            <small>Apr</small>
+                            <small>May</small>
+                            <small>Jun</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card stats-card mb-4" data-aos="fade-left" data-aos-delay="300">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4"><i class="fas fa-trophy me-2 text-warning"></i>Your Achievements</h5>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-leaf fa-2x text-success"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Eco Buyer</h6>
+                                <p class="text-muted mb-0">5+ eco-friendly purchases</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-star fa-2x text-warning"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Premium Shopper</h6>
+                                <p class="text-muted mb-0">3+ premium product purchases</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-bolt fa-2x text-info"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Frequent Buyer</h6>
+                                <p class="text-muted mb-0">10+ orders in the last year</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Card -->
+                <div class="card stats-card" data-aos="fade-left" data-aos-delay="400">
+                    <div class="card-body text-center">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-headset fa-lg text-primary"></i>
+                        </div>
+                        <h5>Need Help with a Purchase?</h5>
+                        <p class="text-muted">Our support team is here to help with any questions about your orders.</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-question-circle me-1"></i> Get Help
+                            </button>
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-exchange-alt me-1"></i> Start Return
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>StyleCart</h5>
+                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Shop</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none">All Products</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">New Arrivals</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Discounts</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Help</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none">FAQ</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Returns</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Shipping</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Newsletter</h5>
+                    <p>Subscribe to get special offers and once-in-a-lifetime deals.</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Your email">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">© 2023 StyleCart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div class="notification notification-success" id="notification">
+        <i class="fas fa-check-circle me-2 text-success"></i>
+        <span id="notification-text"></span>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide page loader
+            setTimeout(() => {
+                document.getElementById('pageLoader').style.opacity = '0';
+                document.getElementById('pageLoader').style.visibility = 'hidden';
+            }, 1000);
+
+            // Initialize star ratings
+            const starRatings = document.querySelectorAll('.star-rating');
+            
+            starRatings.forEach(ratingEl => {
+                const rating = parseInt(ratingEl.getAttribute('data-rating'));
+                const stars = ratingEl.querySelectorAll('i');
+                
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('filled');
+                    }
+                    
+                    // Add hover effect
+                    star.addEventListener('mouseover', () => {
+                        resetStars(stars);
+                        highlightStars(stars, index);
+                    });
+                    
+                    star.addEventListener('mouseout', () => {
+                        resetStars(stars);
+                        highlightStars(stars, rating - 1);
+                    });
+                    
+                    star.addEventListener('click', () => {
+                        const newRating = index + 1;
+                        ratingEl.setAttribute('data-rating', newRating);
+                        showNotification(`Thanks for your ${newRating}-star rating!`);
+                    });
+                });
+            });
+            
+            function resetStars(stars) {
+                stars.forEach(star => {
+                    star.classList.remove('active');
+                });
+            }
+            
+            function highlightStars(stars, index) {
+                for (let i = 0; i <= index; i++) {
+                    stars[i].classList.add('active');
+                }
+            }
+            
+            // Reorder button functionality
+            const reorderButtons = document.querySelectorAll('.reorder-btn');
+            
+            reorderButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const card = button.closest('.card');
+                    const productName = card.querySelector('.card-title').textContent;
+                    
+                    button.innerHTML = '<i class="fas fa-check me-1"></i> Added to Cart';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    
+                    // Show notification
+                    showNotification(`${productName} added to cart!`);
+                    
+                    // Reset button after delay
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fas fa-shopping-cart me-1"></i> Reorder';
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-primary');
+                    }, 2000);
+                });
+            });
+            
+            // Download invoice button functionality
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const card = button.closest('.card');
+                    const productName = card.querySelector('.card-title').textContent;
+                    
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Downloading...';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fas fa-download me-1"></i> Invoice';
+                        showNotification(`Invoice for ${productName} downloaded successfully!`);
+                    }, 1500);
+                });
+            });
+            
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // In a real app, this would filter the purchase list
+                    // For demo, we'll just show a message
+                    const filterText = button.textContent;
+                    showNotification(`Filtering by: ${filterText}`);
+                });
+            });
+            
+            // Show notification function
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Animate progress bars on scroll
+            const progressBar = document.querySelector('.progress-bar');
+            const chartBars = document.querySelectorAll('.chart-bar');
+            
+            // Set initial state
+            progressBar.style.width = '0';
+            chartBars.forEach(bar => bar.style.height = '0');
+            
+            // Animate after a delay
+            setTimeout(() => {
+                progressBar.style.width = '60%';
+                
+                const heights = [40, 70, 100, 150, 120, 80];
+                chartBars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.style.height = `${heights[index]}px`;
+                    }, index * 200);
+                });
+            }, 1000);
+            
+            // Animate purchase cards on scroll
+            const purchaseCards = document.querySelectorAll('.purchase-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            purchaseCards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

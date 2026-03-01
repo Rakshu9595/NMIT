@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoFinds - Add New Product</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2c786c;
+      --secondary-color: #f1c40f;
+      --light-color: #f5f7fa;
+      --dark-color: #333;
+      --success-color: #28a745;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    
+    /* Navbar */
+    .navbar {
+      background: var(--primary-color);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand, .nav-link {
+      color: #fff !important;
+    }
+    
+    /* Header Section */
+    .page-header {
+      background: linear-gradient(rgba(44, 120, 108, 0.9), rgba(44, 120, 108, 0.9)), 
+                  url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center/cover;
+      color: white;
+      padding: 60px 0;
+      margin-bottom: 30px;
+    }
+    
+    /* Form Container */
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* Form Elements */
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 10px;
+      padding: 12px 15px;
+      border: 2px solid #e9ecef;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(44, 120, 108, 0.25);
+    }
+    
+    .input-group-text {
+      background: white;
+      border-radius: 10px 0 0 10px;
+      border: 2px solid #e9ecef;
+      border-right: none;
+    }
+    
+    .form-control:focus + .input-group-text {
+      border-color: var(--primary-color);
+    }
+    
+    /* Image Upload */
+    .image-upload-container {
+      border: 2px dashed #dee2e6;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .image-upload-container:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(44, 120, 108, 0.05);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      color: #6c757d;
+      margin-bottom: 15px;
+    }
+    
+    .image-preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .image-preview {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      animation: zoomIn 0.3s ease-out;
+    }
+    
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      color: #dc3545;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .remove-image:hover {
+      background: #dc3545;
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    /* Category Suggestions */
+    .category-suggestions {
+      position: absolute;
+      width: 100%;
+      background: white;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .category-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .category-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    /* Validation */
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
+    
+    .invalid-feedback {
+      display: none;
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 5px;
+      animation: shake 0.3s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .was-validated .form-select:invalid ~ .invalid-feedback {
+      display: block;
+    }
+    
+    /* Submit Button */
+    .btn-eco {
+      background: var(--secondary-color);
+      border: none;
+      color: #333;
+      font-weight: bold;
+      padding: 12px 30px;
+      border-radius: 50px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-eco:hover {
+      background: #d4ac0d;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-eco:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    /* Success Message */
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--success-color);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      animation: slideInRight 0.5s, fadeOut 0.5s 2.5s forwards;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; visibility: hidden; }
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 20px;
+      }
+      
+      .page-header h1 {
+        font-size: 2rem;
+      }
+      
+      .image-preview {
+        width: 100px;
+        height: 100px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .form-container {
+        padding: 15px;
+      }
+      
+      .image-preview {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-leaf me-2"></i>EcoFinds</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+              data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon bg-light"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-home me-1"></i> Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-store me-1"></i> Marketplace</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><i class="fas fa-plus-circle me-1"></i> Add Product</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-user me-1"></i> Profile</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header Section -->
+  <section class="page-header">
+    <div class="container text-center">
+      <h1 class="display-4 fw-bold mb-3">List a New Product</h1>
+      <p class="lead">Give your pre-loved items a new home and promote sustainability</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="form-container">
+          <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Product Details</h2>
+          
+          <form id="addProductForm" novalidate>
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="productTitle" class="form-label">Product Title *</label>
+                <input type="text" class="form-control" id="productTitle" placeholder="e.g. Vintage Wooden Chair" required>
+                <div class="invalid-feedback">Please provide a product title.</div>
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                <label for="productCategory" class="form-label">Category *</label>
+                <div class="position-relative">
+                  <input type="text" class="form-control" id="productCategory" placeholder="Select or type a category" required>
+                  <div class="category-suggestions" id="categorySuggestions">
+                    <!-- Category suggestions will be populated here -->
+                  </div>
+                  <div class="invalid-feedback">Please select a category.</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="productPrice" class="form-label">Price *</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="productPrice" placeholder="0.00" min="0" step="0.01" required>
+                  <div class="invalid-feedback">Please provide a valid price.</div>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                <label for="productCondition" class="form-label">Condition *</label>
+                <select class="form-select" id="productCondition" required>
+                  <option value="" selected disabled>Select condition</option>
+                  <option value="new">New</option>
+                  <option value="like-new">Like New</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                </select>
+                <div class="invalid-feedback">Please select a condition.</div>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label for="productDescription" class="form-label">Description *</label>
+              <textarea class="form-control" id="productDescription" rows="5" placeholder="Describe your product in detail..." required></textarea>
+              <div class="invalid-feedback">Please provide a product description.</div>
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label">Product Images</label>
+              <div class="image-upload-container" id="imageUploadContainer">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <h5>Drag & Drop or Click to Upload</h5>
+                <p class="text-muted">Upload up to 5 images (JPEG, PNG, GIF)</p>
+                <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;">
+                <button type="button" class="btn btn-outline-primary mt-2" id="browseButton">
+                  <i class="fas fa-folder-open me-2"></i>Browse Files
+                </button>
+              </div>
+              
+              <div class="image-preview-container" id="imagePreviewContainer">
+                <!-- Image previews will be added here -->
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <label for="productLocation" class="form-label">Location</label>
+                <input type="text" class="form-control" id="productLocation" placeholder="City, State">
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                <label for="productTags" class="form-label">Tags</label>
+                <input type="text" class="form-control" id="productTags" placeholder="e.g. vintage, eco-friendly, handmade">
+                <div class="form-text">Separate tags with commas</div>
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+              <button type="button" class="btn btn-outline-secondary me-md-2" id="cancelButton">Cancel</button>
+              <button type="submit" class="btn btn-eco" id="submitButton">
+                <span class="submit-text">List Product</span>
+                <span class="loading-spinner" style="display: none;">
+                  <i class="fas fa-spinner fa-spin me-2"></i>Processing...
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message (initially hidden) -->
+  <div class="success-message" id="successMessage" style="display: none;">
+    <i class="fas fa-check-circle me-2"></i>
+    <span>Product listed successfully!</span>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elements
+      const form = document.getElementById('addProductForm');
+      const categoryInput = document.getElementById('productCategory');
+      const categorySuggestions = document.getElementById('categorySuggestions');
+      const imageUpload = document.getElementById('imageUpload');
+      const browseButton = document.getElementById('browseButton');
+      const imageUploadContainer = document.getElementById('imageUploadContainer');
+      const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+      const submitButton = document.getElementById('submitButton');
+      const submitText = submitButton.querySelector('.submit-text');
+      const loadingSpinner = submitButton.querySelector('.loading-spinner');
+      const successMessage = document.getElementById('successMessage');
+      const cancelButton = document.getElementById('cancelButton');
+      
+      // Available categories
+      const categories = [
+        'Clothing',
+        'Electronics',
+        'Furniture',
+        'Books',
+        'Home & Garden',
+        'Sports & Outdoors',
+        'Toys & Games',
+        'Art & Collectibles',
+        'Jewelry & Accessories',
+        'Automotive',
+        'Tools & DIY',
+        'Music Instruments'
+      ];
+      
+      // Category suggestions functionality
+      categoryInput.addEventListener('focus', showCategorySuggestions);
+      categoryInput.addEventListener('input', showCategorySuggestions);
+      
+      function showCategorySuggestions() {
+        const value = categoryInput.value.toLowerCase();
+        const filteredCategories = categories.filter(category => 
+          category.toLowerCase().includes(value)
+        );
+        
+        if (filteredCategories.length > 0 && value !== '') {
+          categorySuggestions.innerHTML = filteredCategories.map(category => 
+            `<div class="category-item" data-value="${category}">${category}</div>`
+          ).join('');
+          
+          categorySuggestions.style.display = 'block';
+          
+          // Add click event to category items
+          document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function() {
+              categoryInput.value = this.getAttribute('data-value');
+              categorySuggestions.style.display = 'none';
+            });
+          });
+        } else {
+          categorySuggestions.style.display = 'none';
+        }
+      }
+      
+      // Hide category suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!categoryInput.contains(e.target) && !categorySuggestions.contains(e.target)) {
+          categorySuggestions.style.display = 'none';
+        }
+      });
+      
+      // Image upload functionality
+      browseButton.addEventListener('click', function() {
+        imageUpload.click();
+      });
+      
+      imageUploadContainer.addEventListener('click', function(e) {
+        if (e.target === imageUploadContainer) {
+          imageUpload.click();
+        }
+      });
+      
+      // Drag and drop functionality
+      imageUploadContainer.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = 'var(--primary-color)';
+        this.style.backgroundColor = 'rgba(44, 120, 108, 0.1)';
+      });
+      
+      imageUploadContainer.addEventListener('dragleave', function() {
+        this.style.borderColor = '#dee2e6';
+        this.style.backgroundColor = 'transparent';
+      });
+      
+      imageUploadContainer.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#dee2e6';
+        this.style.backgroundColor = 'transparent';
+        
+        if (e.dataTransfer.files.length > 0) {
+          handleImageUpload(e.dataTransfer.files);
+        }
+      });
+      
+      imageUpload.addEventListener('change', function() {
+        if (this.files.length > 0) {
+          handleImageUpload(this.files);
+        }
+      });
+      
+      function handleImageUpload(files) {
+        const currentImageCount = imagePreviewContainer.children.length;
+        const remainingSlots = 5 - currentImageCount;
+        
+        if (remainingSlots <= 0) {
+          alert('You can only upload up to 5 images.');
+          return;
+        }
+        
+        const filesToProcess = Array.from(files).slice(0, remainingSlots);
+        
+        filesToProcess.forEach(file => {
+          if (!file.type.match('image.*')) {
+            alert('Please upload only image files.');
+            return;
+          }
+          
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            
+            preview.innerHTML = `
+              <img src="${e.target.result}" alt="Preview">
+              <button type="button" class="remove-image">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            
+            imagePreviewContainer.appendChild(preview);
+            
+            // Add event listener to remove button
+            preview.querySelector('.remove-image').addEventListener('click', function() {
+              preview.remove();
+            });
+          };
+          
+          reader.readAsDataURL(file);
+        });
+      }
+      
+      // Form validation and submission
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic validation
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+          if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+          } else {
+            field.classList.remove('is-invalid');
+          }
+        });
+        
+        // Price validation
+        const priceField = document.getElementById('productPrice');
+        if (priceField.value && parseFloat(priceField.value) <= 0) {
+          priceField.classList.add('is-invalid');
+          priceField.nextElementSibling.textContent = 'Price must be greater than 0.';
+          isValid = false;
+        }
+        
+        if (isValid) {
+          // Show loading state
+          submitText.style.display = 'none';
+          loadingSpinner.style.display = 'inline';
+          submitButton.disabled = true;
+          
+          // Simulate API call
+          setTimeout(() => {
+            // Show success message
+            successMessage.style.display = 'flex';
+            
+            // Reset form after success
+            setTimeout(() => {
+              form.reset();
+              imagePreviewContainer.innerHTML = '';
+              submitText.style.display = 'inline';
+              loadingSpinner.style.display = 'none';
+              submitButton.disabled = false;
+              
+              // In a real application, you would redirect or show a confirmation page
+              console.log('Form submitted successfully!');
+            }, 1000);
+          }, 2000);
+        }
+      });
+      
+      // Real-time validation
+      form.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('input', function() {
+          if (this.hasAttribute('required') && this.value.trim()) {
+            this.classList.remove('is-invalid');
+          }
+        });
+      });
+      
+      // Cancel button
+      cancelButton.addEventListener('click', function() {
+        if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+          form.reset();
+          imagePreviewContainer.innerHTML = '';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

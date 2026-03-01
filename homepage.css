@@ -1,0 +1,202 @@
+ :root {
+      --primary-color: #2c786c;
+      --secondary-color: #f1c40f;
+      --light-color: #f5f7fa;
+      --dark-color: #333;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light-color);
+      color: var(--dark-color);
+    }
+    
+    .navbar {
+      background: var(--primary-color);
+    }
+    
+    .navbar-brand, .nav-link {
+      color: #fff !important;
+    }
+    
+    .hero {
+      height: 90vh;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(rgba(44,120,108,0.8), rgba(44,120,108,0.8)),
+                  url("https://images.unsplash.com/photo-1506784365847-bbad939e9335") no-repeat center/cover;
+      color: #fff;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: bold;
+    }
+    
+    .btn-eco {
+      background: var(--secondary-color);
+      border: none;
+      color: var(--dark-color);
+      font-weight: bold;
+      padding: 12px 30px;
+      border-radius: 50px;
+      transition: 0.3s;
+    }
+    
+    .btn-eco:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+    }
+    
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--secondary-color);
+    }
+    
+    .feature-card, .category-card, .step-card {
+      border-radius: 15px;
+      transition: 0.3s;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      text-align: center;
+      height: 100%;
+    }
+    
+    .feature-card:hover, .category-card:hover, .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .category-card {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent, rgba(44,120,108,0.1));
+      opacity: 0;
+      transition: 0.3s;
+    }
+    
+    .category-card:hover::before {
+      opacity: 1;
+    }
+    
+    .testimonial-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      height: 100%;
+    }
+    
+    .testimonial-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 15px;
+      border: 3px solid var(--secondary-color);
+    }
+    
+    footer {
+      background: var(--primary-color);
+      color: #fff;
+      text-align: center;
+      padding: 30px 10px;
+    }
+    
+    footer a { 
+      color: var(--secondary-color); 
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Search Bar */
+    .search-container {
+      max-width: 500px;
+      margin: 30px auto;
+    }
+    
+    /* Mobile Navigation */
+    .navbar-toggler {
+      border: none;
+      padding: 0;
+      width: 30px;
+      height: 20px;
+      position: relative;
+    }
+    
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+    
+    .navbar-toggler-icon {
+      background-image: none;
+      position: relative;
+      height: 2px;
+      width: 100%;
+      background-color: #fff;
+      display: block;
+    }
+    
+    .navbar-toggler-icon::before,
+    .navbar-toggler-icon::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #fff;
+    }
+    
+    .navbar-toggler-icon::before {
+      top: -8px;
+    }
+    
+    .navbar-toggler-icon::after {
+      bottom: -8px;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .hero {
+        height: 70vh;
+      }
+      
+      .category-card {
+        min-height: 100px;
+      }
+    }

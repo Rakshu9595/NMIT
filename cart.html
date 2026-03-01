@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Shopping Cart</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --secondary-color: #6f42c1;
+      --accent-color: #36b9cc;
+      --success-color: #1cc88a;
+      --danger-color: #e74a3b;
+      --warning-color: #f6c23e;
+    }
+    
+    body {
+      background: linear-gradient(-45deg, #f9f9f9, #eef2ff, #fef9f9, #eafdfc);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      padding: 0.8rem 1rem;
+    }
+    
+    .cart-card {
+      animation: fadeIn 1s ease;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      background: white;
+    }
+    
+    .cart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    
+    .quantity-btn {
+      cursor: pointer;
+      font-weight: bold;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    
+    .quantity-btn:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .wishlist-btn {
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .wishlist-btn:hover {
+      text-decoration: underline;
+      color: var(--primary-color);
+    }
+    
+    .summary-card {
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      animation: fadeIn 1.5s ease;
+      background: white;
+    }
+    
+    .progress-bar {
+      background-color: var(--primary-color);
+    }
+    
+    .suggested-product {
+      transition: all 0.3s;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .suggested-product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .badge-discount {
+      background: linear-gradient(to right, var(--success-color), #17a673);
+      color: white;
+    }
+    
+    .shipping-option {
+      border-left: 3px solid var(--primary-color);
+      transition: all 0.3s;
+    }
+    
+    .shipping-option:hover {
+      background-color: #f8f9fc;
+    }
+    
+    .cart-icon-animation {
+      animation: bounce 0.5s ease;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+      40% {transform: translateY(-20px);}
+      60% {transform: translateY(-10px);}
+    }
+    
+    .item-removed {
+      animation: slideOut 0.5s ease forwards;
+    }
+    
+    @keyframes slideOut {
+      to {
+        opacity: 0;
+        transform: translateX(100px);
+        height: 0;
+        margin: 0;
+        padding: 0;
+      }
+    }
+    
+    .promo-success {
+      animation: pulse 0.5s ease;
+    }
+    
+    @keyframes pulse {
+      0% {transform: scale(1);}
+      50% {transform: scale(1.05);}
+      100% {transform: scale(1);}
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .cart-card .row {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .quantity-controls {
+        justify-content: center;
+        margin-top: 1rem;
+      }
+      
+      .product-image {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="fas fa-shopping-bag me-2 text-primary"></i>StyleCart
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Cart</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Account</a>
+          </li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <a href="#" class="btn btn-outline-primary me-2">
+            <i class="fas fa-heart"></i>
+            <span class="d-none d-md-inline"> Wishlist</span>
+          </a>
+          <a href="#" class="btn btn-primary position-relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">4</span>
+            <span class="d-none d-md-inline"> Cart</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <h2 class="mb-4 fw-bold"><i class="fas fa-shopping-cart me-2 text-primary"></i>Your Shopping Cart</h2>
+        
+        <!-- Free Shipping Progress -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0">You're <strong>$21.02</strong> away from free shipping!</h6>
+              <span class="badge bg-primary">$78.98/$100</span>
+            </div>
+            <div class="progress" style="height: 10px;">
+              <div class="progress-bar" role="progressbar" style="width: 78.98%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Items -->
+        <div id="cartItems">
+          <!-- Item 1 -->
+          <div class="card cart-card p-3" data-price="499">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-2 text-center product-image">
+                <img src="https://www.theaudiostore.in/cdn/shop/files/sony-wh-ch720n-noise-canceling-wireless-headphones-black-43220896874751_1024x.webp?v=1744396394" class="img-fluid rounded" alt="Headphones">
+              </div>
+              <div class="col-md-5">
+                <h5 class="product-title mb-2">Wireless Noise-Cancelling Headphones</h5>
+                <p class="text-muted mb-1">Color: Off White</p>
+                <p class="text-muted mb-1">In stock</p>
+                <a href="#" class="wishlist-btn"><i class="fas fa-heart me-1"></i> Move to Wishlist</a>
+              </div>
+              <div class="col-md-2 text-center">
+                <p class="mb-0 fw-bold">₹499</p>
+                <p class="text-danger"><small>Save ₹100</small></p>
+              </div>
+              <div class="col-md-3 text-center quantity-controls">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                  <button class="btn btn-outline-secondary quantity-btn minus">-</button>
+                  <input type="text" class="form-control text-center mx-2 quantity-input" value="1" style="width:50px;">
+                  <button class="btn btn-outline-secondary quantity-btn plus">+</button>
+                </div>
+                <button class="btn btn-sm btn-outline-danger remove-btn"><i class="fas fa-trash-alt me-1"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="card cart-card p-3" data-price="799">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-2 text-center product-image">
+                <img src="https://www.gonoise.com/cdn/shop/files/1_64a47a47-00f7-4e58-ac9f-8544e664bf77.png?v=1756978722" class="img-fluid rounded" alt="Smart Watch">
+              </div>
+              <div class="col-md-5">
+                <h5 class="product-title mb-2">Smart Watch Series 5</h5>
+                <p class="text-muted mb-1">Color: Green </p>
+                <p class="text-muted mb-1">In stock</p>
+                <a href="#" class="wishlist-btn"><i class="fas fa-heart me-1"></i> Move to Wishlist</a>
+              </div>
+              <div class="col-md-2 text-center">
+                <p class="mb-0 fw-bold">₹799</p>
+                <p class="text-success"><small>Free Shipping</small></p>
+              </div>
+              <div class="col-md-3 text-center quantity-controls">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                  <button class="btn btn-outline-secondary quantity-btn minus">-</button>
+                  <input type="text" class="form-control text-center mx-2 quantity-input" value="1" style="width:50px;">
+                  <button class="btn btn-outline-secondary quantity-btn plus">+</button>
+                </div>
+                <button class="btn btn-sm btn-outline-danger remove-btn"><i class="fas fa-trash-alt me-1"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="card cart-card p-3" data-price="1299">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-2 text-center product-image">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpxtLxkCfAqfViZreiFtnJFI3fkFijiFoH9Q&s" class="img-fluid rounded" alt="Shoes">
+              </div>
+              <div class="col-md-5">
+                <h5 class="product-title mb-2">Premium Shoes</h5>
+                <p class="text-muted mb-1">Color: Gold </p>
+                <p class="text-muted mb-1">In stock</p>
+                <a href="#" class="wishlist-btn"><i class="fas fa-heart me-1"></i> Move to Wishlist</a>
+              </div>
+              <div class="col-md-2 text-center">
+                <p class="mb-0 fw-bold">₹1299</p>
+                <p class="text-danger"><small>30% OFF</small></p>
+              </div>
+              <div class="col-md-3 text-center quantity-controls">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                  <button class="btn btn-outline-secondary quantity-btn minus">-</button>
+                  <input type="text" class="form-control text-center mx-2 quantity-input" value="1" style="width:50px;">
+                  <button class="btn btn-outline-secondary quantity-btn plus">+</button>
+                </div>
+                <button class="btn btn-sm btn-outline-danger remove-btn"><i class="fas fa-trash-alt me-1"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="card cart-card p-3" data-price="1599">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-2 text-center product-image">
+                <img src="https://m.media-amazon.com/images/I/61R95dMIc7L.UY1100.jpg" class="img-fluid rounded" alt="Backpack">
+              </div>
+              <div class="col-md-5">
+                <h5 class="product-title mb-2">Travel Backpack - Waterproof</h5>
+                <p class="text-muted mb-1">Color: Peach </p>
+                <p class="text-muted mb-1">In stock</p>
+                <a href="#" class="wishlist-btn"><i class="fas fa-heart me-1"></i> Move to Wishlist</a>
+              </div>
+              <div class="col-md-2 text-center">
+                <p class="mb-0 fw-bold">₹1599</p>
+                <p class="text-success"><small>Bestseller</small></p>
+              </div>
+              <div class="col-md-3 text-center quantity-controls">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                  <button class="btn btn-outline-secondary quantity-btn minus">-</button>
+                  <input type="text" class="form-control text-center mx-2 quantity-input" value="1" style="width:50px;">
+                  <button class="btn btn-outline-secondary quantity-btn plus">+</button>
+                </div>
+                <button class="btn btn-sm btn-outline-danger remove-btn"><i class="fas fa-trash-alt me-1"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frequently Bought Together -->
+        <div class="mt-5">
+          <h4 class="mb-4"><i class="fas fa-boxes me-2 text-primary"></i>Frequently Bought Together</h4>
+          <div class="row">
+            <div class="col-md-3 col-6 mb-3">
+              <div class="card suggested-product h-100">
+                <img src="https://culltique.in/cdn/shop/files/case-website-mockup-1-1-60_9bd4a556-8949-42a6-b368-67c57fb9b707.jpg?v=1719742842&width=1646" class="card-img-top" alt="Phone Case">
+                <div class="card-body">
+                  <h6 class="card-title">Phone Case</h6>
+                  <p class="card-text text-primary fw-bold">₹299</p>
+                  <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+              <div class="card suggested-product h-100">
+                <img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQhvu5LOLMWPtftsyHqZLlZPHAiWh1xed_7fyuS1sMsu6HLnKvtZ3LRrS4T-vc48xvVS1ZMtv5QjYLZL_FlXfKOaPsq6HpkyZFunLDwbznHEvlpf7dqQJq6" class="card-img-top" alt="Charger">
+                <div class="card-body">
+                  <h6 class="card-title">Fast Charger</h6>
+                  <p class="card-text text-primary fw-bold">₹499</p>
+                  <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+              <div class="card suggested-product h-100">
+                <img src="https://mobilezon.in/wp-content/uploads/2023/07/iPhone-12-mini-edge-to-edge-tempered-glass.jpg" class="card-img-top" alt="Screen Guard">
+                <div class="card-body">
+                  <h6 class="card-title">Tempered Glass</h6>
+                  <p class="card-text text-primary fw-bold">₹199</p>
+                  <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+              <div class="card suggested-product h-100">
+                <img src="https://m.media-amazon.com/images/I/71vCy-D4VjL.SX679.jpg" class="card-img-top" alt="Stand">
+                <div class="card-body">
+                  <h6 class="card-title">Phone Stand</h6>
+                  <p class="card-text text-primary fw-bold">₹349</p>
+                  <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <!-- Order Summary -->
+        <div class="card p-4 shadow-sm summary-card sticky-lg-top" style="top: 20px;">
+          <h4 class="mb-3"><i class="fas fa-receipt me-2 text-primary"></i>Order Summary</h4>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal (4 items)</span>
+            <span id="subtotal">₹0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Discount</span>
+            <span id="discount" class="text-success">-₹0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Shipping</span>
+            <span id="shipping">₹99</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Tax</span>
+            <span id="tax">₹0</span>
+          </div>
+          
+          <hr>
+          
+          <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+            <span>Total</span>
+            <span id="totalAmount">₹0</span>
+          </div>
+          
+          <!-- Promo Code -->
+          <div class="mb-4">
+            <label for="promoCode" class="form-label fw-bold">Promo Code</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="promoCode" placeholder="Enter code">
+              <button class="btn btn-primary" id="applyPromo">Apply</button>
+            </div>
+            <div id="promoMessage" class="form-text"></div>
+          </div>
+          
+          <!-- Shipping Options -->
+          <div class="mb-4">
+            <h6 class="fw-bold mb-3">Shipping Options</h6>
+            
+            <div class="form-check mb-2 shipping-option p-2 rounded">
+              <input class="form-check-input" type="radio" name="shippingOption" id="standard" checked>
+              <label class="form-check-label w-100" for="standard">
+                <div class="d-flex justify-content-between">
+                  <span>Standard Delivery</span>
+                  <span>₹99</span>
+                </div>
+                <small class="text-muted">5-7 business days</small>
+              </label>
+            </div>
+            
+            <div class="form-check mb-2 shipping-option p-2 rounded">
+              <input class="form-check-input" type="radio" name="shippingOption" id="express">
+              <label class="form-check-label w-100" for="express">
+                <div class="d-flex justify-content-between">
+                  <span>Express Delivery</span>
+                  <span>₹199</span>
+                </div>
+                <small class="text-muted">2-3 business days</small>
+              </label>
+            </div>
+            
+            <div class="form-check shipping-option p-2 rounded">
+              <input class="form-check-input" type="radio" name="shippingOption" id="nextDay">
+              <label class="form-check-label w-100" for="nextDay">
+                <div class="d-flex justify-content-between">
+                  <span>Next Day Delivery</span>
+                  <span>₹399</span>
+                </div>
+                <small class="text-muted">Order before 8PM</small>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="d-grid gap-2">
+            <button class="btn btn-danger mb-2" id="clearCart">
+              <i class="fas fa-trash-alt me-2"></i>Clear Cart
+            </button>
+            <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+              <i class="fas fa-lock me-2"></i>Proceed to Checkout
+            </button>
+          </div>
+          
+          <div class="mt-3 text-center">
+            <p class="text-muted"><i class="fas fa-shield-alt me-2 text-primary"></i>Secure checkout. All transactions are encrypted.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-check-circle me-2 text-success"></i>Confirm Checkout</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Review your order details before proceeding to payment:</p>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Items (4):</span>
+            <span id="modalItems">₹0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Shipping:</span>
+            <span id="modalShipping">₹99</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Discount:</span>
+            <span id="modalDiscount" class="text-success">-₹0</span>
+          </div>
+          <hr>
+          <p class="fw-bold fs-5">Final Total: <span id="modalTotal">₹0</span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+          <button type="button" class="btn btn-success">Confirm & Pay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-5 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <h5>StyleCart</h5>
+          <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+        </div>
+        <div class="col-md-2 mb-4">
+          <h5>Shop</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white text-decoration-none">All Products</a></li>
+            <li><a href="#" class="text-white text-decoration-none">New Arrivals</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Discounts</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2 mb-4">
+          <h5>Help</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white text-decoration-none">FAQ</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Returns</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Shipping</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4 mb-4">
+          <h5>Newsletter</h5>
+          <p>Subscribe to get special offers and once-in-a-lifetime deals.</p>
+          <div class="input-group">
+            <input type="email" class="form-control" placeholder="Your email">
+            <button class="btn btn-primary">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="text-center">
+        <p class="mb-0">© 2023 StyleCart. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let discountValue = 0;
+    let shippingCost = 99;
+
+    const updateTotal = () => {
+      let subtotal = 0;
+      document.querySelectorAll(".cart-card").forEach(card => {
+        const price = parseInt(card.getAttribute("data-price"));
+        const qty = parseInt(card.querySelector(".quantity-input").value);
+        subtotal += price * qty;
+      });
+
+      let discount = subtotal * discountValue;
+      let tax = (subtotal - discount) * 0.08; // 8% tax
+      let total = subtotal - discount + shippingCost + tax;
+
+      document.getElementById("subtotal").textContent = "₹" + subtotal.toFixed(2);
+      document.getElementById("discount").textContent = "-₹" + discount.toFixed(2);
+      document.getElementById("tax").textContent = "₹" + tax.toFixed(2);
+      document.getElementById("totalAmount").textContent = "₹" + total.toFixed(2);
+      
+      // Update modal values
+      document.getElementById("modalItems").textContent = "₹" + subtotal.toFixed(2);
+      document.getElementById("modalDiscount").textContent = "-₹" + discount.toFixed(2);
+      document.getElementById("modalShipping").textContent = "₹" + shippingCost.toFixed(2);
+      document.getElementById("modalTotal").textContent = "₹" + total.toFixed(2);
+      
+      // Update cart badge
+      const itemCount = document.querySelectorAll(".cart-card").length;
+      document.querySelector(".badge").textContent = itemCount;
+    };
+
+    // Quantity +/-
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("plus")) {
+        const input = e.target.closest(".cart-card").querySelector(".quantity-input");
+        input.value = parseInt(input.value) + 1;
+        updateTotal();
+        
+        // Animation
+        e.target.classList.add("cart-icon-animation");
+        setTimeout(() => {
+          e.target.classList.remove("cart-icon-animation");
+        }, 500);
+      }
+      if (e.target.classList.contains("minus")) {
+        const input = e.target.closest(".cart-card").querySelector(".quantity-input");
+        if (parseInt(input.value) > 1) {
+          input.value = parseInt(input.value) - 1;
+          updateTotal();
+          
+          // Animation
+          e.target.classList.add("cart-icon-animation");
+          setTimeout(() => {
+            e.target.classList.remove("cart-icon-animation");
+          }, 500);
+        }
+      }
+      if (e.target.classList.contains("remove-btn")) {
+        const card = e.target.closest(".cart-card");
+        card.classList.add("item-removed");
+        setTimeout(() => {
+          card.remove();
+          updateTotal();
+        }, 500);
+      }
+    });
+
+    // Promo code
+    document.getElementById("applyPromo").addEventListener("click", () => {
+      const code = document.getElementById("promoCode").value.trim();
+      const promoMessage = document.getElementById("promoMessage");
+      
+      if (code === "DISCOUNT10") {
+        discountValue = 0.1;
+        promoMessage.textContent = "Promo code applied! 10% discount added.";
+        promoMessage.classList.add("text-success");
+        promoMessage.classList.remove("text-danger");
+        
+        // Animation
+        document.getElementById("discount").parentElement.classList.add("promo-success");
+        setTimeout(() => {
+          document.getElementById("discount").parentElement.classList.remove("promo-success");
+        }, 500);
+      } else if (code === "FREESHIP") {
+        shippingCost = 0;
+        promoMessage.textContent = "Free shipping applied!";
+        promoMessage.classList.add("text-success");
+        promoMessage.classList.remove("text-danger");
+        
+        // Animation
+        document.getElementById("shipping").classList.add("promo-success");
+        setTimeout(() => {
+          document.getElementById("shipping").classList.remove("promo-success");
+        }, 500);
+      } else {
+        discountValue = 0;
+        shippingCost = 99;
+        promoMessage.textContent = "Invalid promo code.";
+        promoMessage.classList.add("text-danger");
+        promoMessage.classList.remove("text-success");
+      }
+      updateTotal();
+    });
+
+    // Shipping options
+    document.querySelectorAll('input[name="shippingOption"]').forEach(option => {
+      option.addEventListener("change", (e) => {
+        if (e.target.id === "standard") {
+          shippingCost = 99;
+        } else if (e.target.id === "express") {
+          shippingCost = 199;
+        } else if (e.target.id === "nextDay") {
+          shippingCost = 399;
+        }
+        updateTotal();
+      });
+    });
+
+    // Clear cart
+    document.getElementById("clearCart").addEventListener("click", () => {
+      const cartItems = document.getElementById("cartItems");
+      cartItems.querySelectorAll(".cart-card").forEach(card => {
+        card.classList.add("item-removed");
+      });
+      
+      setTimeout(() => {
+        cartItems.innerHTML = '<div class="text-center py-5"><i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i><h4 class="text-muted">Your cart is empty</h4><p class="text-muted">Add some items to get started</p><a href="#" class="btn btn-primary">Continue Shopping</a></div>';
+        updateTotal();
+      }, 500);
+    });
+
+    // Initial load
+    updateTotal();
+  </script>
+</body>
+</html>

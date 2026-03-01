@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoFinds - User Dashboard</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-color: #2c786c;
+      --secondary-color: #f1c40f;
+      --light-color: #f5f7fa;
+      --dark-color: #333;
+      --success-color: #28a745;
+      --info-color: #17a2b8;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      min-height: 100vh;
+    }
+    
+    /* Navbar */
+    .navbar {
+      background: var(--primary-color);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand, .nav-link {
+      color: #fff !important;
+    }
+    
+    /* Dashboard Layout */
+    .dashboard-container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .welcome-message {
+      animation: fadeInDown 1s ease-out;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Profile Card */
+    .profile-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: slideInLeft 0.8s ease-out;
+    }
+    
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--primary-color);
+      margin: 0 auto 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .profile-img:hover {
+      transform: scale(1.05);
+      border-color: var(--secondary-color);
+    }
+    
+    .stats-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: slideInRight 0.8s ease-out;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    /* Navigation Cards */
+    .nav-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      text-align: center;
+      transition: all 0.3s ease;
+      height: 100%;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .nav-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .nav-card i {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+    }
+    
+    .nav-card:hover i {
+      color: var(--secondary-color);
+      transform: scale(1.1);
+    }
+    
+    .nav-card h5 {
+      margin-bottom: 10px;
+      color: var(--dark-color);
+    }
+    
+    .nav-card p {
+      color: #6c757d;
+      margin-bottom: 15px;
+    }
+    
+    .nav-card .btn {
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    /* Edit Profile Modal */
+    .modal-content {
+      border-radius: 15px;
+      border: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+      background: var(--primary-color);
+      color: white;
+      border-radius: 15px 15px 0 0;
+      border: none;
+    }
+    
+    .btn-eco {
+      background: var(--secondary-color);
+      border: none;
+      color: #333;
+      font-weight: bold;
+      padding: 10px 25px;
+      border-radius: 50px;
+      transition: 0.3s;
+    }
+    
+    .btn-eco:hover {
+      background: #d4ac0d;
+      transform: scale(1.05);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 15px;
+      }
+      
+      .profile-img {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .stat-number {
+        font-size: 1.5rem;
+      }
+      
+      .nav-card {
+        padding: 20px 15px;
+      }
+      
+      .nav-card i {
+        font-size: 2rem;
+      }
+    }
+    
+    /* Animation Delays */
+    .delay-1 {
+      animation-delay: 0.1s;
+    }
+    
+    .delay-2 {
+      animation-delay: 0.2s;
+    }
+    
+    .delay-3 {
+      animation-delay: 0.3s;
+    }
+    
+    .delay-4 {
+      animation-delay: 0.4s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-leaf me-2"></i>EcoFinds</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+              data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon bg-light"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-store me-1"></i> Marketplace</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-bell me-1"></i> Notifications</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i> Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-container">
+    <!-- Welcome Message -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="welcome-message">
+          <h1 class="display-5 fw-bold">Hello, <span id="userFirstName">John</span> 👋</h1>
+          <p class="lead text-muted">Welcome back to your sustainable marketplace dashboard.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Profile Card -->
+      <div class="col-lg-4">
+        <div class="profile-card">
+          <div class="position-relative d-inline-block">
+            <img src="https://ui-avatars.com/api/?name=John+Doe&background=2c786c&color=fff&size=400" 
+                 class="profile-img" id="profileImage" alt="Profile">
+            <div class="position-absolute bottom-0 end-0 bg-white rounded-circle p-1 shadow-sm">
+              <i class="fas fa-camera text-primary"></i>
+            </div>
+          </div>
+          <h4 id="userName">John Doe</h4>
+          <p class="text-muted" id="userEmail">john.doe@example.com</p>
+          <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Portland, Oregon</p>
+          
+          <button class="btn btn-eco mt-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit me-2"></i>Edit Profile
+          </button>
+          
+          <!-- Hidden file input for image upload -->
+          <input type="file" id="imageUpload" style="display: none;" accept="image/*">
+        </div>
+      </div>
+      
+      <!-- Stats Cards -->
+      <div class="col-lg-8">
+        <div class="row g-3 h-100">
+          <div class="col-md-4">
+            <div class="stats-card">
+              <div class="stat-number" id="totalListings">12</div>
+              <div class="stat-label">Total Listings</div>
+              <div class="progress mt-3" style="height: 8px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stats-card">
+              <div class="stat-number" id="itemsSold">8</div>
+              <div class="stat-label">Items Sold</div>
+              <div class="progress mt-3" style="height: 8px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stats-card">
+              <div class="stat-number" id="cartItems">3</div>
+              <div class="stat-label">Cart Items</div>
+              <div class="progress mt-3" style="height: 8px;">
+                <div class="progress-bar bg-info" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mini Chart -->
+          <div class="col-12 mt-3">
+            <div class="stats-card">
+              <h5 class="mb-3">Monthly Activity</h5>
+              <canvas id="activityChart" height="100"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation Cards -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-6 col-lg-3">
+        <div class="nav-card delay-1">
+          <i class="fas fa-list"></i>
+          <h5>My Listings</h5>
+          <p>Manage your products and track their performance</p>
+          <a href="#" class="btn btn-outline-primary">View Listings</a>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="nav-card delay-2">
+          <i class="fas fa-shopping-cart"></i>
+          <h5>Cart</h5>
+          <p>Review items in your cart and proceed to checkout</p>
+          <a href="#" class="btn btn-outline-success">View Cart</a>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="nav-card delay-3">
+          <i class="fas fa-history"></i>
+          <h5>Purchase History</h5>
+          <p>View your past orders and download invoices</p>
+          <a href="#" class="btn btn-outline-info">View History</a>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="nav-card delay-4">
+          <i class="fas fa-heart"></i>
+          <h5>Wishlist</h5>
+          <p>Items you've saved for later</p>
+          <a href="#" class="btn btn-outline-danger">View Wishlist</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Recent Activity</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div class="list-group-item border-0 d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  <span>Your listing "Vintage Wooden Chair" was sold</span>
+                </div>
+                <small class="text-muted">2 hours ago</small>
+              </div>
+              <div class="list-group-item border-0 d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-shopping-cart text-primary me-2"></i>
+                  <span>You added "Organic Cotton T-shirt" to your cart</span>
+                </div>
+                <small class="text-muted">1 day ago</small>
+              </div>
+              <div class="list-group-item border-0 d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="fas fa-star text-warning me-2"></i>
+                  <span>Someone liked your "Bamboo Cutting Board" listing</span>
+                </div>
+                <small class="text-muted">2 days ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="profileForm">
+            <div class="mb-3 text-center">
+              <img src="https://ui-avatars.com/api/?name=John+Doe&background=2c786c&color=fff&size=400" 
+                   class="profile-img mb-3" id="profileImagePreview" alt="Profile" style="cursor: pointer;">
+              <input type="file" id="profileImageUpload" class="d-none" accept="image/*">
+              <div class="form-text">Click on image to change</div>
+            </div>
+            <div class="mb-3">
+              <label for="editName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="editName" value="John Doe">
+            </div>
+            <div class="mb-3">
+              <label for="editEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="editEmail" value="john.doe@example.com">
+            </div>
+            <div class="mb-3">
+              <label for="editLocation" class="form-label">Location</label>
+              <input type="text" class="form-control" id="editLocation" value="Portland, Oregon">
+            </div>
+            <div class="mb-3">
+              <label for="editBio" class="form-label">Bio</label>
+              <textarea class="form-control" id="editBio" rows="3">Eco-conscious seller focused on sustainable products.</textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-eco" id="saveProfileBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize activity chart
+      const ctx = document.getElementById('activityChart').getContext('2d');
+      const activityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Listings',
+            data: [5, 8, 7, 10, 12, 15],
+            borderColor: '#2c786c',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(44, 120, 108, 0.1)'
+          }, {
+            label: 'Sales',
+            data: [2, 4, 5, 7, 8, 10],
+            borderColor: '#f1c40f',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(241, 196, 15, 0.1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+      
+      // Profile image upload functionality
+      const profileImage = document.getElementById('profileImage');
+      const imageUpload = document.getElementById('imageUpload');
+      const profileImagePreview = document.getElementById('profileImagePreview');
+      const profileImageUpload = document.getElementById('profileImageUpload');
+      
+      profileImage.addEventListener('click', function() {
+        imageUpload.click();
+      });
+      
+      profileImagePreview.addEventListener('click', function() {
+        profileImageUpload.click();
+      });
+      
+      imageUpload.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            profileImage.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+      
+      profileImageUpload.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            profileImagePreview.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+      
+      // Save profile changes
+      document.getElementById('saveProfileBtn').addEventListener('click', function() {
+        // Update profile info
+        document.getElementById('userName').textContent = document.getElementById('editName').value;
+        document.getElementById('userEmail').textContent = document.getElementById('editEmail').value;
+        
+        // Update profile image if changed
+        if (profileImagePreview.src !== profileImage.src) {
+          profileImage.src = profileImagePreview.src;
+        }
+        
+        // Show success message
+        alert('Profile updated successfully!');
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+        modal.hide();
+      });
+      
+      // Animate stats counting
+      function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          obj.innerHTML = Math.floor(progress * (end - start) + start);
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+      
+      // Start animations after a short delay
+      setTimeout(() => {
+        animateValue('totalListings', 0, 12, 1000);
+        animateValue('itemsSold', 0, 8, 1000);
+        animateValue('cartItems', 0, 3, 1000);
+      }, 500);
+    });
+  </script>
+</body>
+</html>
